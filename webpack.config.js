@@ -1,31 +1,4 @@
-import {
-  webpackRscLayerName,
-  createWebpackRscServerLoader,
-  createWebpackRscSsrLoader,
-  createWebpackRscClientLoader,
-  WebpackRscServerPlugin,
-} from '@mfng/webpack-rsc';
 import TerserPlugin from 'terser-webpack-plugin';
-import { WebpackRscClientPlugin } from './webpack/webpack-rsc-client-plugin.js';
-
-const clientReferencesMap = new Map();
-const serverReferencesMap = new Map();
-const rscServerLoader = createWebpackRscServerLoader({ clientReferencesMap });
-const rscSsrLoader = createWebpackRscSsrLoader();
-const rscClientLoader = createWebpackRscClientLoader({ serverReferencesMap });
-const stats = {
-  assets: true,
-  builtAt: true,
-  chunks: false,
-  colors: true,
-  groupAssetsByEmitStatus: false,
-  groupAssetsByExtension: true,
-  groupAssetsByInfo: false,
-  groupAssetsByPath: false,
-  hash: false,
-  modules: false,
-  version: false,
-};
 
 const serverConfig = {
   name: 'server',
@@ -35,41 +8,12 @@ const serverConfig = {
     filename: 'server.cjs',
   },
   module: {
-    rules: [
-      {
-        resource: (value) =>
-          /core\/lib\/server\/rsc\.js$/.test(value) || /rsc\.js$/.test(value),
-        layer: webpackRscLayerName,
-      },
-      {
-        issuerLayer: webpackRscLayerName,
-        resolve: { conditionNames: ['react-server', '...'] },
-      },
-      {
-        oneOf: [
-          {
-            issuerLayer: webpackRscLayerName,
-            test: /\.jsx?$/,
-            use: [rscServerLoader, 'swc-loader'],
-          },
-          {
-            test: /\.jsx?$/,
-            use: [rscSsrLoader, 'swc-loader'],
-          },
-        ],
-      },
-    ],
+    rules: [],
   },
-  plugins: [
-    new WebpackRscServerPlugin({
-      clientReferencesMap,
-      serverReferencesMap,
-    }),
-  ],
+  plugins: [],
   experiments: {
     layers: true,
   },
-  stats,
 };
 
 const clientConfig = {
@@ -81,14 +25,9 @@ const clientConfig = {
     filename: 'client.js',
   },
   module: {
-    rules: [
-      {
-        test: /.jsx?$/,
-        use: [rscClientLoader, 'swc-loader'],
-      },
-    ],
+    rules: [],
   },
-  plugins: [new WebpackRscClientPlugin({ clientReferencesMap })],
+  plugins: [],
   optimization: {
     minimizer: [
       new TerserPlugin({
@@ -104,7 +43,6 @@ const clientConfig = {
       }),
     ],
   },
-  stats,
 };
 
 export default [serverConfig, clientConfig];
