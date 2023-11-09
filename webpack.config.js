@@ -1,14 +1,42 @@
 import TerserPlugin from 'terser-webpack-plugin';
 
+const clientReferencesMap = new Map();
+
 const serverConfig = {
   name: 'server',
-  entry: './server/ssr.js',
+  entry: './index.js',
   target: 'node',
   output: {
     filename: 'server.cjs',
   },
   module: {
-    rules: [],
+    rules: [{
+      resource: (value) => /\rsc.js$/,
+      layer: 'reactServer'
+    }, {
+      issuerLayer: 'reactServer',
+      resolve: {
+        conditionNames: ['react-server', '...']
+      }
+    }, {
+      oneOf: [
+        {
+          issuerLayer: 'reactServer',
+          test: /\.jsx?$/,
+          use: [{
+            loader: './webpack/rsc-server-loader.js',
+            options: {
+              clientReferencesMap
+            }
+          },
+            'swc-loader']
+        },
+        {
+          test: /\.jsx?$/,
+          use: ['swc-loader']
+        }
+      ]
+    }],
   },
   plugins: [],
   experiments: {
@@ -25,7 +53,12 @@ const clientConfig = {
     filename: 'client.js',
   },
   module: {
-    rules: [],
+    rules: [
+      {
+        test: /\.jsx?$/,
+        use: ['swc-loader']
+      }
+    ],
   },
   plugins: [],
   optimization: {
