@@ -1,7 +1,7 @@
 // run `node index.js` in the terminal
 import express from 'express';
-import {renderJSXToReadableStream} from './server/rsc';
-import {renderHtml} from './server/ssr';
+import {Router, renderJSXToReadableStream} from './server/rsc.js';
+import {renderHtml} from './server/ssr.js';
 
 const app = express();
 
@@ -13,7 +13,7 @@ app.get('*', async (req, res) => {
 
 
 function render(res, url) {
-  const jsxStream = renderJSXToReadableStream(<Router url={url} />, {});
+  const jsxStream = renderJSXToReadableStream(<Router url={url} />, { /* Client manifest */});
 
   if (url.searchParams.has('jsx')) {
     renderJSX(res, jsxStream);

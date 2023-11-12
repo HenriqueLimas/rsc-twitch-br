@@ -1,6 +1,7 @@
 import TerserPlugin from 'terser-webpack-plugin';
 
 const clientReferencesMap = new Map();
+const rscLayer = 'reactServer'
 
 const serverConfig = {
   name: 'server',
@@ -11,17 +12,19 @@ const serverConfig = {
   },
   module: {
     rules: [{
-      resource: (value) => /\rsc.js$/,
-      layer: 'reactServer'
+      resource: (value) =>
+        value.includes('rsc.js') ||
+        value.includes('pages'),
+      layer: rscLayer
     }, {
-      issuerLayer: 'reactServer',
+      issuerLayer: rscLayer,
       resolve: {
         conditionNames: ['react-server', '...']
       }
     }, {
       oneOf: [
         {
-          issuerLayer: 'reactServer',
+          issuerLayer: rscLayer,
           test: /\.jsx?$/,
           use: [{
             loader: './webpack/rsc-server-loader.js',

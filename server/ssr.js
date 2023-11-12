@@ -1,4 +1,5 @@
-import {use, renderToPipeableStream} from 'react-dom/server'
+import {use} from 'react'
+import {renderToPipeableStream} from 'react-dom/server'
 import {createFromReadableStream} from 'react-server-dom-webpack/client.edge'
 
 export async function renderHtml(res, jsxStream) {
@@ -10,7 +11,7 @@ export async function renderHtml(res, jsxStream) {
       return flightResponseRef.current;
     }
 
-    const flightResponse = createFromReadableStream(jsxStream, {})
+    const flightResponse = createFromReadableStream(jsxStream, {ssrManifest: {}})
     flightResponseRef.current = flightResponse
 
     return use(flightResponse);

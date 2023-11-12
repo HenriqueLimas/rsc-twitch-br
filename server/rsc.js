@@ -1,7 +1,7 @@
-import {AppLayout} from "../pages/app-layout";
-import {BlogPost} from "../pages/blog-post";
-import {BlogPostList} from "../pages/blog-post-list";
-import {renderToRedableStream} from 'react-server-dom-webpack/server.edge'
+import {AppLayout} from "../pages/app-layout.js";
+import {BlogPost} from "../pages/blog-post.js";
+import {BlogPostList} from "../pages/blog-post-list.js";
+import {renderToReadableStream} from 'react-server-dom-webpack/server.edge'
 
 export async function Router({url}) {
   let page;
@@ -17,5 +17,5 @@ export async function Router({url}) {
 }
 
 export const renderJSXToReadableStream = (jsx, clientManifest) => {
-  return renderToRedableStream(jsx, clientManifest)
+  return renderToReadableStream(jsx, clientManifest)
 }

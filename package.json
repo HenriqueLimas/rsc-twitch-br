@@ -3,7 +3,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "nodemon -- --experimental-loader ./node-jsx-loader.js index.js",
+    "start": "yarn build && node --inspect dist/server.cjs",
+    "build": "webpack --mode=production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
@@ -19,7 +20,8 @@
     "react-server-dom-webpack": "^18.3.0-canary-ce2bc58a9-20231102",
     "swc-loader": "^0.2.3",
     "terser-webpack-plugin": "^5.3.9",
-    "webpack": "^5.89.0"
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "escape-html": "^1.0.3",

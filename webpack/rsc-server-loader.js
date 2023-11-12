@@ -26,6 +26,8 @@ export default function rscServerLoader(source) {
         } else {
           nodePath.skip()
         }
+
+        return
       }
 
       if (isUseClientDirective(node)) {
@@ -46,6 +48,7 @@ export default function rscServerLoader(source) {
         })
 
         nodePath.replaceWith(createExportReference(id, exportName))
+        nodePath.skip();
       } else {
         nodePath.remove();
       }
@@ -62,7 +65,6 @@ export default function rscServerLoader(source) {
   }
 
   const {code} = generate.default(ast, {
-    sourceType: 'module',
     sourceFileName: resourcePath
   })
 
@@ -74,7 +76,7 @@ function isUseClientDirective(directive) {
 }
 
 function getExportName(node) {
-  if (t.isExportDeclaration(node)) {
+  if (t.isExportNamedDeclaration(node)) {
     // Function
     if (t.isFunctionDeclaration(node.declaration)) {
       return node.declaration.id.name
