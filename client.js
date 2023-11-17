@@ -1,36 +1,39 @@
-import { hydrateRoot } from 'react-dom/client';
+import {use, useState} from 'react';
+import {hydrateRoot} from 'react-dom/client';
+import {createFromFetch, createFromReadableStream} from 'react-server-dom-webpack/client.browser';
 
-function getInitialJSX() {
-  return parseClientJSX(window.__INITIAL_TREE__);
+const initialStream = new ReadableStream({
+  start(controller) {
+    const encoder = new TextEncoder();
+    window.__rscController__ = controller;
+    window.__rsc__ = window.__rsc__ || [];
+    window.__rsc__.forEach(rscTree => {
+      controller.enqueue(encoder.encode(rscTree))
+    })
+
+    window.__addInitialRSCTree__ = rscTree => controller.enqueue(encoder.encode(rscTree))
+  }
+})
+
+let updateRoot;
+
+function Root({data}) {
+  const [root, setRoot] = useState(use(data))
+  updateRoot = setRoot
+  return root;
 }
 
-const root = hydrateRoot(document, getInitialJSX());
+const initialData = createFromReadableStream(initialStream)
+hydrateRoot(document, <Root data={initialData} />);
 
 let currentPathname = window.location.pathname;
 
-function parseClientJSX(jsxString) {
-  return JSON.parse(jsxString, decodeJSX);
-}
-
-function decodeJSX(name, value) {
-  if (value === '$RE') {
-    return Symbol.for('react.element');
-  }
-
-  if (typeof value === 'string' && value.startsWith('$$')) {
-    return value.slice(1);
-  }
-
-  return value;
-}
-
 async function navigate(pathname) {
   currentPathname = pathname;
-  const response = await fetch(pathname + '?jsx');
-  const jsxJSON = parseClientJSX(await response.text());
+  const response = await createFromFetch(fetch(pathname + '?jsx'));
 
   if (currentPathname === pathname) {
-    root.render(jsxJSON);
+    updateRoot(response);
   }
 }
 

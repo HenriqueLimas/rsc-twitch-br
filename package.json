@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "yarn build && node --inspect dist/server.cjs",
-    "build": "webpack --mode=production",
+    "build": "webpack --mode=development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {

@@ -8,7 +8,10 @@ const app = express();
 
 app.use(compression())
 app.use('/client.js', express.static('./dist/client.js'));
-app.get('/', async (req, res) => {
+app.get('/favicon.ico', () => {
+  res.end()
+})
+app.get('*', async (req, res) => {
   const url = new URL(req.url, `https://${req.headers.host}`);
   render(res, url);
 })

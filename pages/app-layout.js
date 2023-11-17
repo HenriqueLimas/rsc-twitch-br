@@ -5,7 +5,7 @@ export function AppLayout({children}) {
   return (
     <html>
       <head>
-        <meta charset="utf8" />
+        <meta charSet="utf8" />
         <title>Meu Blog</title>
       </head>
       <body>

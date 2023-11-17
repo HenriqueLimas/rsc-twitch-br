@@ -1,4 +1,3 @@
-import {use} from 'react'
 import {renderToPipeableStream} from 'react-dom/server'
 import {createFromReadableStream} from 'react-server-dom-webpack/client.edge'
 import {PassThrough} from 'node:stream'
@@ -19,7 +18,7 @@ export async function renderHtml(res, jsxStream) {
       return flightResponseRef.current;
     }
 
-    const [renderStream, inlineStream] = jsxStream.tee();
+    const [inlineStream, renderStream] = jsxStream.tee();
     const flightResponse = createFromReadableStream(renderStream, {ssrManifest: {}})
     flightResponseRef.current = flightResponse
 
@@ -32,7 +31,6 @@ export async function renderHtml(res, jsxStream) {
       const rscTree = decoder.decode(value, {stream: true})
 
       if (!bootstrapped) {
-        console.log('Write bootstrap script')
         inlineDataStream.write(`<script>${bootstrapScriptContent}</script>`);
         bootstrapped = true;
       }
@@ -44,9 +42,7 @@ export async function renderHtml(res, jsxStream) {
         return;
       }
 
-      console.log('write inline script')
       inlineDataStream.write(`<script>window.__addInitialRSCTree__(${htmlescape(rscTree)})</script>`);
-      res.flush()
       read();
     }
 
@@ -57,7 +53,6 @@ export async function renderHtml(res, jsxStream) {
   const {pipe} = renderToPipeableStream(<ServerRoot />, {
     bootstrapScripts: ['/client.js'],
     onShellReady() {
-      console.log('onShellReady')
       inlineDataStream.pipe(res, {end: false});
       pipe(res)
     }
