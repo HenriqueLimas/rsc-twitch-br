@@ -6,6 +6,7 @@ import {renderHtml} from './server/ssr.js';
 const app = express();
 
 app.use('/client.js', express.static('./dist/client.js'));
+app.get('/favicon.ico', (req, res) => res.end())
 app.get('*', async (req, res) => {
   const url = new URL(req.url, `https://${req.headers.host}`);
   render(res, url);
@@ -25,11 +26,21 @@ function render(res, url) {
 function renderJSX(res, jsxStream) {
   res.setHeader('Content-Type', 'application/json');
 
-  const result = '';
+  const reader = jsxStream.getReader()
 
-  // TODO: Renderizar JSX
+  async function read() {
+    const {done, value} = await reader.read()
+    const decoder = new TextDecoder()
+    const rscTree = decoder.decode(value, {stream: true})
+    if (done) {
+      res.end();
+    } else {
+      read()
+      res.write(rscTree)
+    }
+  }
 
-  res.write(result);
+  read()
 }
 
 

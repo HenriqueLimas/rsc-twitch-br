@@ -1,3 +1,5 @@
+import {Suspense} from "react";
+
 export function AppLayout({children}) {
   const author = 'Joãozinho';
   return (
@@ -9,7 +11,9 @@ export function AppLayout({children}) {
       <body>
         <input />
 
-        {children}
+        <Suspense>
+          {children}
+        </Suspense>
 
         <footer>
           <i>Feito com ❤️ por {author}</i>
